@@ -25,116 +25,128 @@ export default function MemoryCard({ memory, onReveal }: MemoryCardProps) {
     const [hasBeenRevealed, setHasBeenRevealed] = useState(false);
     const [tilt, setTilt] = useState({ x: 0, y: 0 });
 
-    // Detect when the card enters the central viewport scan line (around 50vh - 65vh)
-    // this is where the Pikmin is situated.
-    const isInSensorZone = useInView(cardRef, {
-        margin: '-45% 0px -35% 0px', // Matches the ~60vh mark
-        once: false
+    // Fire when the card is 25% visible — generous so all cards reveal while scrolling
+    const isInView = useInView(cardRef, {
+        margin: '0px 0px -15% 0px',
+        once: true, // revealed once = stays open forever (no flickering)
     });
 
     useEffect(() => {
-        if (isInSensorZone && !hasBeenRevealed) {
-            setHasBeenRevealed(true);
-            if (onReveal) {
-                onReveal(memory.id);
-            }
+        if (isInView && !hasBeenRevealed) {
+            // Small delay so the Pikmin "walks to" the card before it opens
+            const t = setTimeout(() => {
+                setHasBeenRevealed(true);
+                if (onReveal) onReveal(memory.id);
+            }, 180);
+            return () => clearTimeout(t);
         }
-    }, [isInSensorZone, hasBeenRevealed, memory.id, onReveal]);
+    }, [isInView, hasBeenRevealed, memory.id, onReveal]);
 
-    // 3D Tilt Effect on hover
+    // Tap-to-reveal fallback (mobile / accessibility)
+    const handleTap = () => {
+        if (!hasBeenRevealed) {
+            setHasBeenRevealed(true);
+            if (onReveal) onReveal(memory.id);
+        }
+    };
+
+    // Subtle 3D tilt on hover (desktop only)
     const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
         if (!cardRef.current || !hasBeenRevealed) return;
         const rect = cardRef.current.getBoundingClientRect();
-        const width = rect.width;
-        const height = rect.height;
-        const mouseX = e.clientX - rect.left - width / 2;
-        const mouseY = e.clientY - rect.top - height / 2;
-
-        // Smooth angle tilt values
-        const rX = -(mouseY / height) * 15; // Max 15 degrees
-        const rY = (mouseX / width) * 15;
-
-        setTilt({ x: rX, y: rY });
+        const rx = -((e.clientY - rect.top - rect.height / 2) / rect.height) * 12;
+        const ry = ((e.clientX - rect.left - rect.width / 2) / rect.width) * 12;
+        setTilt({ x: rx, y: ry });
     };
+    const handleMouseLeave = () => setTilt({ x: 0, y: 0 });
 
-    const handleMouseLeave = () => {
-        setTilt({ x: 0, y: 0 });
-    };
-
-    // Card side layouts
-    const sideAlignProps = {
-        left: 'mr-auto md:ml-12 md:mr-0',
-        right: 'ml-auto md:mr-12 md:ml-0',
-        center: 'mx-auto'
-    };
+    const sideClass = {
+        left: 'mr-auto ml-4 md:ml-16',
+        right: 'ml-auto mr-4 md:mr-16',
+        center: 'mx-auto',
+    }[memory.side] ?? 'mx-auto';
 
     return (
         <div
             ref={cardRef}
-            className={`w-full max-w-[280px] xs:max-w-[325px] flex flex-col items-center py-6 px-4 z-20 ${sideAlignProps[memory.side] || sideAlignProps.left
-                }`}
+            onClick={handleTap}
+            className={`w-[280px] sm:w-[310px] flex flex-col items-center py-8 z-20 pointer-events-auto cursor-pointer ${sideClass}`}
         >
-            {/* 3D Tilt Frame Wrapper */}
             <motion.div
-                className="w-full relative rounded-2xl bg-stone-950/80 border border-stone-800 shadow-2xl p-3 select-none overflow-hidden duration-300"
+                className="w-full relative rounded-2xl bg-[#12170f] border border-[#2a3d20] shadow-2xl p-2.5 overflow-hidden"
                 onMouseMove={handleMouseMove}
                 onMouseLeave={handleMouseLeave}
                 style={{
                     transformStyle: 'preserve-3d',
-                    transform: `perspective(600px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
+                    transform: `perspective(700px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
                     boxShadow: hasBeenRevealed
-                        ? '0 20px 40px -15px rgba(0, 0, 0, 0.7), 0 0 15px 1px rgba(78, 124, 89, 0.15)'
-                        : '0 10px 20px -10px rgba(0, 0, 0, 0.5)'
+                        ? '0 24px 48px -12px rgba(0,0,0,0.8), 0 0 24px 2px rgba(59,130,80,0.2)'
+                        : '0 8px 24px -8px rgba(0,0,0,0.6)',
+                    transition: 'box-shadow 0.4s ease',
                 }}
             >
-                {/* Photo Container */}
-                <div className="relative w-full aspect-[4/5] rounded-xl overflow-hidden bg-stone-900 border border-stone-850">
+                {/* Photo frame */}
+                <div className="relative w-full aspect-[4/5] rounded-xl overflow-hidden bg-[#0a100a]">
 
-                    {/* Foliage cover overlay */}
+                    {/* Foliage cover — slides away when revealed */}
                     <FoliageOverlay type={memory.foliageType} isOpen={hasBeenRevealed} />
 
-                    {/* Actual Memory Photo */}
+                    {/* Photo */}
                     <motion.img
                         src={`/images/${memory.fileName}`}
                         alt={memory.caption}
-                        className="w-full h-full object-cover select-none"
-                        initial={{ scale: 1.1, filter: 'blur(5px)' }}
-                        animate={
-                            hasBeenRevealed
-                                ? { scale: 1, filter: 'blur(0px)' }
-                                : { scale: 1.1, filter: 'blur(5px)' }
-                        }
-                        transition={{ duration: 0.8, ease: 'easeOut' }}
+                        className="absolute inset-0 w-full h-full object-cover select-none"
+                        loading="lazy"
+                        initial={{ scale: 1.08, filter: 'blur(6px) brightness(0.6)' }}
+                        animate={hasBeenRevealed
+                            ? { scale: 1, filter: 'blur(0px) brightness(1)' }
+                            : { scale: 1.08, filter: 'blur(6px) brightness(0.6)' }}
+                        transition={{ duration: 0.7, ease: [0.25, 0.1, 0.25, 1] }}
                     />
 
-                    {/* Sparkle particle overlay when revealed */}
+                    {/* Tap hint when not yet revealed */}
+                    {!hasBeenRevealed && (
+                        <motion.div
+                            className="absolute inset-0 flex flex-col items-center justify-center gap-2"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.5 }}
+                        >
+                            <span className="text-2xl">🌿</span>
+                            <span className="text-[10px] font-sans text-emerald-300/70 tracking-widest uppercase">
+                                Toca para revelar
+                            </span>
+                        </motion.div>
+                    )}
+
+                    {/* Soft vignette once revealed */}
                     {hasBeenRevealed && (
-                        <div className="absolute inset-0 bg-gradient-to-t from-emerald-950/20 to-transparent mix-blend-screen pointer-events-none animate-pulse" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#0a100a]/60 via-transparent to-transparent pointer-events-none" />
                     )}
                 </div>
 
-                {/* Caption and content info section */}
-                <div className="relative mt-4 px-1 min-h-[90px] flex flex-col justify-between">
-                    <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={hasBeenRevealed ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
-                        transition={{ delay: 0.4, duration: 0.5 }}
+                {/* Caption area */}
+                <div className="px-2 pt-3 pb-1 min-h-[88px] flex flex-col justify-between">
+                    <motion.p
+                        className="font-handwriting text-[#e8f0e0] text-[1.15rem] leading-snug"
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={hasBeenRevealed ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
+                        transition={{ delay: 0.35, duration: 0.55 }}
                     >
-                        {/* Hand-written text caption */}
-                        <p className="font-handwriting text-stone-100 text-lg leading-relaxed leading-[1.3] text-left">
-                            {memory.caption}
-                        </p>
-                    </motion.div>
+                        {memory.caption}
+                    </motion.p>
 
                     <motion.div
-                        className="mt-3 flex items-center justify-between text-[11px] font-sans tracking-widest text-[#7FB069] uppercase"
+                        className="mt-2 flex items-center justify-between"
                         initial={{ opacity: 0 }}
                         animate={hasBeenRevealed ? { opacity: 1 } : { opacity: 0 }}
-                        transition={{ delay: 0.7, duration: 0.4 }}
+                        transition={{ delay: 0.65, duration: 0.4 }}
                     >
-                        <span>{memory.date}</span>
-                        <span className="text-[10px] text-stone-600 font-mono">
-                            N° {String(memory.id).padStart(2, '0')}
+                        <span className="text-[10px] font-sans tracking-widest text-[#7aaa60] uppercase">
+                            {memory.date}
+                        </span>
+                        <span className="text-[9px] font-mono text-[#3d5c30]">
+                            #{String(memory.id).padStart(2, '0')}
                         </span>
                     </motion.div>
                 </div>

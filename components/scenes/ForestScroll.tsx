@@ -165,7 +165,7 @@ export default function ForestScroll({ userType, userAccessory }: ForestScrollPr
             </div>
 
             {/* SCENARIO CONTENT SCROLL GRID */}
-            <div className="relative w-full z-20 flex flex-col pointer-events-none">
+            <div className="relative w-full z-20 flex flex-col pointer-events-auto">
 
                 {/* Iterate over scenes */}
                 {scenes.map((scene) => {

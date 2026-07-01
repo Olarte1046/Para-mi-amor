@@ -16,253 +16,248 @@ export default function PikminSvg({
     isWalking,
     facingRight,
     className = '',
-    width = 100,
-    height = 120
+    width = 80,
+    height = 120,
 }: PikminSvgProps) {
-    // Colors for body
-    const bodyColors = {
-        red: { primary: '#dc2626', shadow: '#b91c1c', specular: '#f87171' },
-        yellow: { primary: '#eab308', shadow: '#ca8a04', specular: '#fde047' },
-        blue: { primary: '#2563eb', shadow: '#1d4ed8', specular: '#60a5fa' },
-        rock: { primary: '#6b7280', shadow: '#4b5563', specular: '#9ca3af' }
+    const uid = `pikmin-${type}-${accessory}`;
+
+    // Pikmin game-faithful color palettes
+    const palette = {
+        red: { body: '#e8201e', light: '#ef6463', dark: '#8a1010', belly: '#f5aaaa', nose: '#c0170f' },
+        yellow: { body: '#f5c200', light: '#ffe066', dark: '#9a7a00', belly: '#fde8a0', nose: '#c79500' },
+        blue: { body: '#2060e8', light: '#75a8f5', dark: '#103898', belly: '#a0c4f5', nose: '#1040b0' },
+        rock: { body: '#4d4d5e', light: '#8888a0', dark: '#2a2a36', belly: '#7a7a8c', nose: '#3a3a48' },
     };
+    const c = palette[type] ?? palette.red;
 
-    const colors = bodyColors[type] || bodyColors.red;
+    // Stem/stalk color
+    const stemColor = '#3d7a1a';
 
-    // Animation classes
-    const walkClass = isWalking ? 'animate-walk' : 'animate-breathing';
-    const leftFootClass = isWalking ? 'animate-foot-left' : '';
-    const rightFootClass = isWalking ? 'animate-foot-right' : '';
-    const stemClass = isWalking ? 'animate-stem-wobble' : 'animate-stem-sway';
+    // Walking vs idle animation ids
+    const animId = isWalking ? 'walk' : 'idle';
 
     return (
         <svg
             width={width}
             height={height}
-            viewBox="0 0 100 120"
-            className={`${className} transition-transform duration-300`}
-            style={{
-                transform: `scaleX(${facingRight ? 1 : -1})`,
-                overflow: 'visible'
-            }}
+            viewBox="0 0 80 120"
+            overflow="visible"
+            className={className}
+            style={{ transform: `scaleX(${facingRight ? 1 : -1})`, display: 'block' }}
         >
             <defs>
-                {/* Style definitions for simple but fluid css animations */}
-                <style dangerouslySetInnerHTML={{
-                    __html: `
-          @keyframes spacing-breath {
-            0%, 100% { transform: scale(1) translateY(0px); }
-            50% { transform: scale(0.97, 1.03) translateY(-1px); }
-          }
-          @keyframes walking-wobble {
-            0%, 100% { transform: rotate(-4deg) translateY(0px); }
-            50% { transform: rotate(4deg) translateY(-2px); }
-          }
-          @keyframes foot-walk-l {
-            0%, 100% { transform: rotate(-10deg) translateY(0px); }
-            50% { transform: rotate(15deg) translateY(-1px); }
-          }
-          @keyframes foot-walk-r {
-            0%, 100% { transform: rotate(15deg) translateY(-1px); }
-            50% { transform: rotate(-10deg) translateY(0px); }
-          }
-          @keyframes stem-swaying {
-            0%, 100% { transform: rotate(-3deg); }
-            50% { transform: rotate(3deg); }
-          }
-          @keyframes stem-wobbling {
-            0%, 100% { transform: rotate(-7deg); }
-            50% { transform: rotate(7deg); }
-          }
-          .animate-breathing {
-            animation: spacing-breath 2.5s ease-in-out infinite;
-            transform-origin: 50% 90%;
-          }
-          .animate-walk {
-            animation: walking-wobble 0.35s ease-in-out infinite;
-            transform-origin: 50% 90%;
-          }
-          .animate-foot-left {
-            animation: foot-walk-l 0.35s ease-in-out infinite;
-            transform-origin: 40% 90%;
-          }
-          .animate-foot-right {
-            animation: foot-walk-r 0.35s ease-in-out infinite;
-            transform-origin: 60% 90%;
-          }
-          .animate-stem-sway {
-            animation: stem-swaying 2.5s ease-in-out infinite;
-            transform-origin: 50% 40%;
-          }
-          .animate-stem-wobble {
-            animation: stem-wobbling 0.35s ease-in-out infinite;
-            transform-origin: 50% 40%;
-          }
-        `}} />
+                <style>{`
+                    @keyframes pikmin-idle-${uid} {
+                        0%,100% { transform: translateY(0px) rotate(0deg); }
+                        50%     { transform: translateY(-2px) rotate(1deg); }
+                    }
+                    @keyframes pikmin-walk-${uid} {
+                        0%,100% { transform: translateY(0px) rotate(-4deg); }
+                        50%     { transform: translateY(-3px) rotate(4deg); }
+                    }
+                    @keyframes stem-idle-${uid} {
+                        0%,100% { transform: rotate(-4deg); }
+                        50%     { transform: rotate(4deg); }
+                    }
+                    @keyframes stem-walk-${uid} {
+                        0%,100% { transform: rotate(-10deg); }
+                        50%     { transform: rotate(10deg); }
+                    }
+                    @keyframes foot-l-${uid} {
+                        0%,100% { transform: rotate(-15deg); }
+                        50%     { transform: rotate(10deg); }
+                    }
+                    @keyframes foot-r-${uid} {
+                        0%,100% { transform: rotate(10deg); }
+                        50%     { transform: rotate(-15deg); }
+                    }
+                    .body-${uid} {
+                        transform-origin: 40px 90px;
+                        animation: ${isWalking ? `pikmin-walk-${uid}` : `pikmin-idle-${uid}`}
+                                   ${isWalking ? '0.4s' : '2.2s'} ease-in-out infinite;
+                    }
+                    .stem-${uid} {
+                        transform-origin: 40px 46px;
+                        animation: ${isWalking ? `stem-walk-${uid}` : `stem-idle-${uid}`}
+                                   ${isWalking ? '0.4s' : '2.2s'} ease-in-out infinite;
+                    }
+                    .foot-l-${uid} {
+                        transform-origin: 29px 103px;
+                        animation: ${isWalking ? `foot-l-${uid}` : 'none'} 0.4s ease-in-out infinite;
+                    }
+                    .foot-r-${uid} {
+                        transform-origin: 51px 103px;
+                        animation: ${isWalking ? `foot-r-${uid}` : 'none'} 0.4s ease-in-out infinite;
+                    }
+                `}</style>
 
-                {/* Shading gradients */}
-                <radialGradient id={`bodyGrad-${type}`} cx="45%" cy="40%" r="55%">
-                    <stop offset="0%" stopColor={colors.specular} />
-                    <stop offset="60%" stopColor={colors.primary} />
-                    <stop offset="100%" stopColor={colors.shadow} />
+                {/* Body gradient */}
+                <radialGradient id={`bg-${uid}`} cx="38%" cy="35%" r="62%">
+                    <stop offset="0%" stopColor={c.light} />
+                    <stop offset="55%" stopColor={c.body} />
+                    <stop offset="100%" stopColor={c.dark} />
                 </radialGradient>
-
-                {/* Shadow filter under feet */}
-                <filter id="shadowFilter" x="-20%" y="-20%" width="140%" height="140%">
-                    <feGaussianBlur stdDeviation="3" result="blur" />
-                    <feColorMatrix type="matrix" values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.15 0" />
-                </filter>
+                {/* Belly gradient */}
+                <radialGradient id={`belly-${uid}`} cx="50%" cy="50%" r="55%">
+                    <stop offset="0%" stopColor={c.belly} stopOpacity="0.95" />
+                    <stop offset="100%" stopColor={c.belly} stopOpacity="0" />
+                </radialGradient>
             </defs>
 
-            {/* Ground Shadow */}
-            <ellipse cx="50" cy="108" rx="22" ry="5" filter="url(#shadowFilter)" />
+            {/* ── Ground shadow ── */}
+            <ellipse cx="40" cy="112" rx="18" ry="4" fill="rgba(0,0,0,0.18)" />
 
-            {/* Feet & Legs */}
-            <g id="feet">
-                {/* Left Foot */}
-                <path
-                    d="M 32 94 A 6 6 0 0 0 44 94 Z"
-                    fill={colors.shadow}
-                    className={leftFootClass}
-                    style={{ transformOrigin: '38px 94px' }}
-                />
-                {/* Right Foot */}
-                <path
-                    d="M 56 94 A 6 6 0 0 0 68 94 Z"
-                    fill={colors.shadow}
-                    className={rightFootClass}
-                    style={{ transformOrigin: '62px 94px' }}
-                />
-            </g>
+            {/* ── Feet (behind body) ── */}
+            <ellipse className={`foot-l-${uid}`} cx="29" cy="105" rx="9" ry="5.5" fill={c.dark} />
+            <ellipse className={`foot-r-${uid}`} cx="51" cy="105" rx="9" ry="5.5" fill={c.dark} />
+            {/* Foot highlights */}
+            <ellipse className={`foot-l-${uid}`} cx="27" cy="103" rx="4" ry="2.5" fill={c.body} opacity="0.55" />
+            <ellipse className={`foot-r-${uid}`} cx="49" cy="103" rx="4" ry="2.5" fill={c.body} opacity="0.55" />
 
-            {/* Main Animated Body Group */}
-            <g className={walkClass}>
+            {/* ══ ANIMATED BODY GROUP ══ */}
+            <g className={`body-${uid}`}>
 
-                {/* STEM (Leaf / Bud / Flower stalk) */}
-                <g id="stem" className={stemClass}>
-                    {/* Stalk */}
+                {/* ── Stem (with own rotation) ── */}
+                <g className={`stem-${uid}`}>
+                    {/* Stalk – curves from crown */}
                     <path
-                        d="M 50 42 C 50 25 54 18 52 10"
-                        fill="none"
-                        stroke="#4d7c0f"
-                        strokeWidth="3.5"
+                        d="M 40 46 C 40 36 43 26 41 14"
+                        stroke={stemColor}
+                        strokeWidth="3.2"
                         strokeLinecap="round"
+                        fill="none"
                     />
 
-                    {/* ACCESSORY ON STALK */}
+                    {/* LEAF */}
                     {accessory === 'leaf' && (
-                        <path
-                            d="M 52 10 C 62 0 74 3 64 12 C 58 17 54 12 52 10 Z"
-                            fill="#22c55e"
-                            stroke="#15803d"
-                            strokeWidth="1"
-                        />
-                    )}
-
-                    {accessory === 'bud' && (
-                        <g transform="translate(52, 9)">
-                            <ellipse cx="0" cy="-4" rx="6" ry="8" fill="#ec4899" stroke="#db2777" strokeWidth="1" />
-                            <path d="M -6 -4 C -2 -12 2 -12 6 -4" fill="none" stroke="#f472b6" strokeWidth="1" />
-                            <path d="M 0 -12 L 0 -4" stroke="#db2777" strokeWidth="1" />
-                            {/* Bud base sepals */}
-                            <path d="M -5 1 C -2 3 2 3 5 1 L 0 -1 Z" fill="#84cc16" />
+                        <g transform="translate(41,14)">
+                            <path
+                                d="M 0 0 C 12 -10 22 -6 14 4 C 8 10 2 5 0 0 Z"
+                                fill="#22c55e"
+                                stroke="#166534"
+                                strokeWidth="0.8"
+                            />
+                            <path d="M 0 0 C 6 -2 12 -4 14 4" fill="none" stroke="#166534" strokeWidth="0.7" />
                         </g>
                     )}
 
-                    {accessory === 'flower' && (
-                        <g transform="translate(52, 3)">
-                            {/* Petals */}
-                            <ellipse cx="0" cy="-10" rx="5" ry="7" fill="#ffffff" />
-                            <ellipse cx="0" cy="4" rx="5" ry="7" fill="#ffffff" />
-                            <ellipse cx="-7" cy="-3" rx="7" ry="5" fill="#ffffff" />
-                            <ellipse cx="7" cy="-3" rx="7" ry="5" fill="#ffffff" />
+                    {/* BUD */}
+                    {accessory === 'bud' && (
+                        <g transform="translate(41,14)">
+                            {/* Sepals */}
+                            <path d="M -4 4 C -2 -2 2 -2 4 4" fill="#4ade80" />
+                            {/* Bud body */}
+                            <ellipse cx="0" cy="-3" rx="5.5" ry="8" fill="#db2777" stroke="#9d174d" strokeWidth="0.8" />
+                            <ellipse cx="-1" cy="-5" rx="2" ry="3" fill="#f472b6" opacity="0.6" />
+                        </g>
+                    )}
 
-                            {/* Flower Center */}
-                            <circle cx="0" cy="-3" r="4.5" fill="#eab308" stroke="#ca8a04" strokeWidth="0.5" />
+                    {/* FLOWER */}
+                    {accessory === 'flower' && (
+                        <g transform="translate(41,14)">
+                            {/* 5 petals */}
+                            {[0, 72, 144, 216, 288].map((angle) => (
+                                <ellipse
+                                    key={angle}
+                                    cx={Math.sin((angle * Math.PI) / 180) * 9}
+                                    cy={-3 + Math.cos((angle * Math.PI) / 180) * -9}
+                                    rx="4.5"
+                                    ry="6.5"
+                                    fill="white"
+                                    stroke="#e2e8f0"
+                                    strokeWidth="0.5"
+                                />
+                            ))}
+                            {/* Centre */}
+                            <circle cx="0" cy="-3" r="5" fill="#facc15" stroke="#a16207" strokeWidth="0.7" />
+                            <circle cx="-1.2" cy="-4.5" r="1.5" fill="#fde68a" />
                         </g>
                     )}
                 </g>
 
-                {/* CHARACTER SPECIFIC BODY ELEMENTS */}
-                <g id="body">
-                    {type === 'rock' ? (
-                        /* Angular polygonal body for Rock Pikmin */
+                {/* ── Yellow Pikmin EARS (behind body) ── */}
+                {type === 'yellow' && (
+                    <>
+                        <path d="M 18 56 C 6 48 4 70 16 68 C 20 67 22 62 22 58 Z"
+                            fill={`url(#bg-${uid})`} stroke={c.dark} strokeWidth="1" />
+                        <path d="M 62 56 C 74 48 76 70 64 68 C 60 67 58 62 58 58 Z"
+                            fill={`url(#bg-${uid})`} stroke={c.dark} strokeWidth="1" />
+                    </>
+                )}
+
+                {/* ── Rock Pikmin body (angular, stone) ── */}
+                {type === 'rock' ? (
+                    <g>
                         <path
-                            d="M 32 46 L 48 38 L 68 44 L 72 65 L 62 86 L 38 88 L 26 68 Z"
-                            fill={`url(#bodyGrad-${type})`}
-                            stroke="#374151"
+                            d="M 22 58 L 30 44 L 50 40 L 62 48 L 66 68 L 58 90 L 22 90 L 16 72 Z"
+                            fill={`url(#bg-${uid})`}
+                            stroke={c.dark}
                             strokeWidth="1.5"
                         />
-                    ) : (
-                        /* Smooth teardrop capsule body for standard Pikmin */
-                        <path
-                            d="M 50 40 C 35 40 32 64 32 74 C 32 86 40 94 50 94 C 60 94 68 86 68 74 C 68 64 65 40 50 40 Z"
-                            fill={`url(#bodyGrad-${type})`}
-                        />
-                    )}
-
-                    {/* Hands */}
-                    {/* Left Hand */}
-                    <circle cx={type === 'rock' ? 24 : 29} cy="70" r="3.5" fill={colors.shadow} />
-                    {/* Right Hand */}
-                    <circle cx={type === 'rock' ? 74 : 71} cy="70" r="3.5" fill={colors.shadow} />
-
-                    {/* Eyes (Huge typical Pikmin eyes) */}
-                    <g id="eyes">
-                        {/* Left Eye */}
-                        <ellipse cx="40" cy="54" rx="6" ry="9" fill="white" />
-                        <circle cx="40" cy="54" r="3" fill="black" />
-                        <circle cx="38.5" cy="51" r="1.2" fill="white" /> {/* Reflection */}
-
-                        {/* Right Eye */}
-                        <ellipse cx="60" cy="54" rx="6" ry="9" fill="white" />
-                        <circle cx="60" cy="54" r="3" fill="black" />
-                        <circle cx="58.5" cy="51" r="1.2" fill="white" /> {/* Reflection */}
+                        {/* Rock scratches */}
+                        <path d="M 30 60 L 36 56" stroke={c.dark} strokeWidth="0.8" opacity="0.5" />
+                        <path d="M 44 75 L 50 70" stroke={c.dark} strokeWidth="0.8" opacity="0.5" />
+                        {/* Belly tint */}
+                        <ellipse cx="40" cy="72" rx="12" ry="10" fill={`url(#belly-${uid})`} />
                     </g>
-
-                    {/* Red Pikmin: Sharp pointy nose */}
-                    {type === 'red' && (
+                ) : (
+                    /* ── Standard Pikmin body: faithful tall pear shape ── */
+                    <g>
+                        {/* Main body shape */}
                         <path
-                            d="M 50 56 Q 64 54 66 58 Q 64 62 50 60 Z"
-                            fill={colors.primary}
-                            stroke={colors.shadow}
-                            strokeWidth="0.5"
+                            d="M 40 44
+                               C 25 44 20 58 20 70
+                               C 20 86 28 96 40 96
+                               C 52 96 60 86 60 70
+                               C 60 58 55 44 40 44 Z"
+                            fill={`url(#bg-${uid})`}
                         />
-                    )}
+                        {/* Belly oval */}
+                        <ellipse cx="40" cy="76" rx="11" ry="13" fill={`url(#belly-${uid})`} />
+                    </g>
+                )}
 
-                    {/* Yellow Pikmin: Large pointy ears on sides */}
-                    {type === 'yellow' && (
-                        <g id="ears">
-                            {/* Left Ear */}
-                            <path
-                                d="M 33 52 C 22 45 15 48 24 58 C 28 62 31 58 33 57"
-                                fill={`url(#bodyGrad-${type})`}
-                                stroke={colors.shadow}
-                                strokeWidth="0.5"
-                            />
-                            {/* Right Ear */}
-                            <path
-                                d="M 67 52 C 78 45 85 48 76 58 C 72 62 69 58 67 57"
-                                fill={`url(#bodyGrad-${type})`}
-                                stroke={colors.shadow}
-                                strokeWidth="0.5"
-                            />
-                        </g>
-                    )}
+                {/* ── Hands (small round nubs on sides) ── */}
+                <circle cx={type === 'rock' ? 17 : 19} cy="74" r="5" fill={c.body} stroke={c.dark} strokeWidth="0.8" />
+                <circle cx={type === 'rock' ? 63 : 61} cy="74" r="5" fill={c.body} stroke={c.dark} strokeWidth="0.8" />
 
-                    {/* Blue Pikmin: Cute white rounded gills / open mouth */}
-                    {type === 'blue' && (
-                        <ellipse
-                            cx="50"
-                            cy="67"
-                            rx="4"
-                            ry="3"
-                            fill="white"
-                            stroke={colors.shadow}
-                            strokeWidth="0.8"
-                        />
-                    )}
-                </g>
+                {/* ── Red nose (long pointy, facing right) ── */}
+                {type === 'red' && (
+                    <path
+                        d="M 56 60 C 66 58 72 61 68 65 C 64 68 56 66 55 63 Z"
+                        fill={c.nose}
+                        stroke={c.dark}
+                        strokeWidth="0.5"
+                    />
+                )}
+
+                {/* ── Blue Pikmin lips / muzzle ── */}
+                {type === 'blue' && (
+                    <path
+                        d="M 33 68 C 35 73 45 73 47 68"
+                        fill="white"
+                        stroke={c.dark}
+                        strokeWidth="1"
+                        strokeLinecap="round"
+                    />
+                )}
+
+                {/* ── EYES (positioned in top-center of body) ── */}
+                {/* Left eye white */}
+                <ellipse cx="32" cy="58" rx="7.5" ry="9" fill="white" />
+                {/* Right eye white */}
+                <ellipse cx="48" cy="58" rx="7.5" ry="9" fill="white" />
+                {/* Left pupil */}
+                <circle cx="33.5" cy="59" r="4.5" fill="#111" />
+                {/* Right pupil */}
+                <circle cx="49.5" cy="59" r="4.5" fill="#111" />
+                {/* Left highlight */}
+                <circle cx="31" cy="55" r="2" fill="white" />
+                {/* Right highlight */}
+                <circle cx="47" cy="55" r="2" fill="white" />
+                {/* Small secondary highlights */}
+                <circle cx="35" cy="61" r="1" fill="white" opacity="0.7" />
+                <circle cx="51" cy="61" r="1" fill="white" opacity="0.7" />
             </g>
         </svg>
     );
