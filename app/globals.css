@@ -1,0 +1,30 @@
+@import "tailwindcss";
+
+:root {
+  --background: #090e0c;
+  --foreground: #f4f6f5;
+}
+
+@theme {
+  --font-sans: var(--font-nunito), sans-serif;
+  --font-handwriting: var(--font-caveat), cursive;
+  --font-mono: var(--font-geist-mono);
+  
+  --color-forest-500: #22c55e;
+  --color-forest-600: #166534;
+  --color-forest-750: #14532d;
+  --color-forest-800: #064e3b;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-nunito), sans-serif;
+  overflow-x: hidden;
+}
+
+/* Scroll Snap container settings if required */
+html {
+  scroll-behavior: smooth;
+}
+
