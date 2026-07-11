@@ -194,11 +194,11 @@ export default function PikminSvg({
             {/* ══ MAIN ANIMATED BODY GROUP ══ */}
             <g className={`${uid}-body`}>
 
-                {/* Yellow Pikmin large ears (behind body) */}
+                {/* Yellow Pikmin large ears (behind body) — wide flap with hooked tip */}
                 {type === 'yellow' && (<>
-                    <path d="M 20 56 C 6 48 2 66 14 68 C 18 69 20 65 22 61 Z"
+                    <path d="M 21 52 C 8 44 1 58 6 68 C 9 74 16 72 20 66 C 22 62 21 56 21 52 Z"
                         fill={C.body} stroke={outline} strokeWidth={ow} strokeLinejoin="round" />
-                    <path d="M 52 56 C 66 48 70 66 58 68 C 54 69 52 65 50 61 Z"
+                    <path d="M 51 52 C 64 44 71 58 66 68 C 63 74 56 72 52 66 C 50 62 51 56 51 52 Z"
                         fill={C.body} stroke={outline} strokeWidth={ow} strokeLinejoin="round" />
                 </>)}
 
@@ -216,18 +216,37 @@ export default function PikminSvg({
                         strokeLinejoin="round"
                     />
                 ) : (
-                    /* Standard Pikmin: authentic elongated bulb from reference */
+                    /* Standard Pikmin: head wide at y≈51, sharp neck pinch at y≈73, wide column to y≈102 */
                     <path
                         d={`
                             M 36 36
-                            C 40 36 46 38 48 44
-                            C 52 50 54 58 54 66
-                            C 54 78 50 90 46 96
-                            C 43 100 40 102 36 102
-                            C 32 102 29 100 26 96
-                            C 22 90 18 78 18 66
-                            C 18 58 20 50 24 44
-                            C 26 38 32 36 36 36 Z
+                            C 42 36 52 42 52 51
+                            C 52 58 46 62 42 67
+                            C 41 70 41 72 41 73
+                            C 41 74 40 75 36 75
+                            C 32 75 31 74 31 73
+                            C 31 72 31 70 30 67
+                            C 26 62 20 58 20 51
+                            C 20 42 30 36 36 36 Z
+                        `}
+                        fill={C.body}
+                        stroke={outline}
+                        strokeWidth={ow}
+                        strokeLinejoin="round"
+                    />
+                )}
+                {/* Lower column / skirt — from neck pinch down to leg attachment */}
+                {type !== 'rock' && (
+                    <path
+                        d={`
+                            M 31 73
+                            C 28 75 27 78 27 85
+                            C 27 92 27 98 28 102
+                            L 44 102
+                            C 45 98 45 92 45 85
+                            C 45 78 44 75 41 73
+                            C 40 75 36 75 36 75
+                            C 36 75 32 75 31 73 Z
                         `}
                         fill={C.body}
                         stroke={outline}
@@ -238,63 +257,55 @@ export default function PikminSvg({
 
                 {/* Body lighting (left highlight) */}
                 <path
-                    d="M 26 46 C 24 52 22 60 23 68 C 24 72 26 70 27 65 C 28 58 28 50 30 44 C 29 43 27 44 26 46 Z"
+                    d="M 26 42 C 24 46 22 52 23 58 C 24 62 26 60 27 56 C 28 50 28 44 30 40 C 29 39 27 40 26 42 Z"
                     fill={C.light}
                     opacity="0.45"
                 />
 
                 {/* Body shade (right side) */}
                 <path
-                    d="M 46 50 C 50 58 52 66 50 78 C 49 83 47 86 46 84 C 44 78 44 68 44 60 C 44 56 45 52 46 50 Z"
+                    d="M 46 46 C 50 52 52 58 50 66 C 49 70 47 72 46 70 C 44 64 44 55 44 48 C 44 44 45 44 46 46 Z"
                     fill={C.shade}
                     opacity="0.35"
                 />
 
-                {/* ── ARMS — thin wavy nubs mid body ── */}
-                {/* Left arm */}
+                {/* ── ARMS — slim nubs, barely protruding from body sides ── */}
+                {/* Left arm — outline first, then fill */}
                 <path
-                    d="M 20 70 C 14 68 10 70 11 74 C 12 77 16 76 19 74"
-                    stroke={C.body}
-                    strokeWidth="6"
-                    strokeLinecap="round"
-                    fill="none"
-                />
-                <path
-                    d="M 20 70 C 14 68 10 70 11 74 C 12 77 16 76 19 74"
+                    d="M 22 78 C 18 76 15 77 16 80 C 17 82 20 82 22 80"
                     stroke={outline}
-                    strokeWidth="7.5"
+                    strokeWidth="4"
                     strokeLinecap="round"
                     fill="none"
-                    style={{ zIndex: -1 }}
                 />
                 <path
-                    d="M 20 70 C 14 68 10 70 11 74 C 12 77 16 76 19 74"
+                    d="M 22 78 C 18 76 15 77 16 80 C 17 82 20 82 22 80"
                     stroke={C.body}
-                    strokeWidth="6"
+                    strokeWidth="2.5"
                     strokeLinecap="round"
                     fill="none"
                 />
                 {/* Right arm */}
                 <path
-                    d="M 52 70 C 58 68 62 70 61 74 C 60 77 56 76 53 74"
+                    d="M 50 78 C 54 76 57 77 56 80 C 55 82 52 82 50 80"
                     stroke={outline}
-                    strokeWidth="7.5"
+                    strokeWidth="4"
                     strokeLinecap="round"
                     fill="none"
                 />
                 <path
-                    d="M 52 70 C 58 68 62 70 61 74 C 60 77 56 76 53 74"
+                    d="M 50 78 C 54 76 57 77 56 80 C 55 82 52 82 50 80"
                     stroke={C.body}
-                    strokeWidth="6"
+                    strokeWidth="2.5"
                     strokeLinecap="round"
                     fill="none"
                 />
 
-                {/* ── LEGS — thin upright stubs ── */}
+                {/* ── LEGS — wider stubs matching column width, short ── */}
                 {/* Left leg */}
-                <rect x="25" y="98" width="8" height="12" rx="3" fill={C.body} stroke={outline} strokeWidth={ow} />
+                <rect x="22" y="100" width="11" height="9" rx="3" fill={C.body} stroke={outline} strokeWidth={ow} />
                 {/* Right leg */}
-                <rect x="39" y="98" width="8" height="12" rx="3" fill={C.body} stroke={outline} strokeWidth={ow} />
+                <rect x="39" y="100" width="11" height="9" rx="3" fill={C.body} stroke={outline} strokeWidth={ow} />
 
                 {/* ── Red Pikmin NOSE — pointing right like reference ── */}
                 {type === 'red' && (
@@ -330,19 +341,17 @@ export default function PikminSvg({
                     In reference: eyes are near HEAD (upper body), WHITE large oval, black pupil, highlight dot
                     They appear to float slightly off the body surface
                 */}
-                {/* Left eye — sticks out left */}
-                <ellipse cx="23" cy="58" rx="10" ry="10" fill={outline} /> {/* Outline circle */}
-                <ellipse cx="23" cy="58" rx="9" ry="9" fill={C.eye} />
-                <circle cx="24" cy="59" r="5.5" fill={C.pupil} />
-                <circle cx="21" cy="55" r="2.5" fill="white" /> {/* Highlight */}
-                <circle cx="26" cy="61" r="1.2" fill="white" opacity="0.6" />
+                {/* Left eye — circular, centered at y≈53 */}
+                <ellipse cx="23" cy="53" rx="9" ry="9" fill={outline} />
+                <ellipse cx="23" cy="53" rx="8" ry="8" fill={C.eye} />
+                <circle cx="24" cy="54" r="4.5" fill={C.pupil} />
+                <circle cx="21" cy="50" r="2" fill="white" /> {/* Highlight */}
 
-                {/* Right eye — sticks out right */}
-                <ellipse cx="49" cy="58" rx="10" ry="10" fill={outline} />
-                <ellipse cx="49" cy="58" rx="9" ry="9" fill={C.eye} />
-                <circle cx="50" cy="59" r="5.5" fill={C.pupil} />
-                <circle cx="47" cy="55" r="2.5" fill="white" />
-                <circle cx="52" cy="61" r="1.2" fill="white" opacity="0.6" />
+                {/* Right eye — circular, centered at y≈53 */}
+                <ellipse cx="49" cy="53" rx="9" ry="9" fill={outline} />
+                <ellipse cx="49" cy="53" rx="8" ry="8" fill={C.eye} />
+                <circle cx="50" cy="54" r="4.5" fill={C.pupil} />
+                <circle cx="47" cy="50" r="2" fill="white" />
 
             </g>
         </svg>

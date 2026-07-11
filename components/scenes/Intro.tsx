@@ -52,7 +52,7 @@ export default function Intro({ onStart }: IntroProps) {
         <div className="relative w-full h-screen bg-[#111827] flex flex-col items-center justify-center overflow-hidden px-4 md:px-0 select-none z-50">
 
             {/* Twilight gradient atmospheric background */}
-            <div className="absolute inset-0 bg-gradient-to-b from-[#1e293b]/70 via-[#111827]/90 to-[#0f172a]" />
+            <div className="absolute inset-0 bg-gradient-to-b from-[#1e293b]/70 via-[#111827]/90 to-[#0f172a] pointer-events-none" />
 
             {/* Organic floating dust particles */}
             <div className="absolute inset-0 opacity-20 pointer-events-none">
@@ -197,8 +197,8 @@ export default function Intro({ onStart }: IntroProps) {
                                             key={t}
                                             onClick={() => setType(t)}
                                             className={`py-2 px-3 text-xs font-sans rounded-lg border transition-all text-center capitalize ${type === t
-                                                    ? 'bg-emerald-950/40 border-emerald-500/50 text-emerald-300 font-medium'
-                                                    : 'bg-stone-950/60 border-stone-850 hover:border-stone-700 text-stone-400'
+                                                ? 'bg-emerald-950/40 border-emerald-500/50 text-emerald-300 font-medium'
+                                                : 'bg-stone-950/60 border-stone-850 hover:border-stone-700 text-stone-400'
                                                 }`}
                                         >
                                             {t === 'red' ? 'Rojo 🔴' : t === 'yellow' ? 'Amarillo 🟡' : 'Azul 🔵'}
@@ -218,8 +218,8 @@ export default function Intro({ onStart }: IntroProps) {
                                             key={a}
                                             onClick={() => setAccessory(a)}
                                             className={`py-2 px-3 text-xs font-sans rounded-lg border transition-all text-center capitalize ${accessory === a
-                                                    ? 'bg-emerald-950/40 border-emerald-500/50 text-emerald-300 font-medium'
-                                                    : 'bg-stone-950/60 border-stone-850 hover:border-stone-700 text-stone-400'
+                                                ? 'bg-emerald-950/40 border-emerald-500/50 text-emerald-300 font-medium'
+                                                : 'bg-stone-950/60 border-stone-850 hover:border-stone-700 text-stone-400'
                                                 }`}
                                         >
                                             {a === 'leaf' ? 'Hoja 🍃' : a === 'bud' ? 'Capullo 🌸' : 'Flor 🌼'}
