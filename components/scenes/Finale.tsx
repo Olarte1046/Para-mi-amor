@@ -1,10 +1,12 @@
 'use client';
 
 import React, { useState } from 'react';
+import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
-import PikminSvg from '../pikmin/PikminSvg';
 import { synth } from '../../lib/audio';
 import { Heart } from 'lucide-react';
+
+const PikminModel3D = dynamic(() => import('../pikmin/PikminModel3D'), { ssr: false });
 
 export interface FinaleProps {
     userType: 'red' | 'yellow' | 'blue';
@@ -147,11 +149,8 @@ export default function Finale({ userType, userAccessory }: FinaleProps) {
                             <div className="relative w-48 h-32 flex justify-center items-end bg-stone-950/40 border border-stone-850 rounded-2xl shadow-inner mb-6 px-4">
                                 {/* Her Customized Pikmin */}
                                 <div className="mr-2 transform translate-y-[8px]">
-                                    <PikminSvg
+                                    <PikminModel3D
                                         type={userType}
-                                        accessory={userAccessory}
-                                        isWalking={false}
-                                        facingRight={true}
                                         width={70}
                                         height={85}
                                     />
@@ -159,11 +158,8 @@ export default function Finale({ userType, userAccessory }: FinaleProps) {
 
                                 {/* You (Rock Pikmin) sitting beside her */}
                                 <div className="ml-2 transform translate-y-[8px]">
-                                    <PikminSvg
+                                    <PikminModel3D
                                         type="rock"
-                                        accessory="flower"
-                                        isWalking={false}
-                                        facingRight={false}
                                         width={65}
                                         height={75}
                                     />

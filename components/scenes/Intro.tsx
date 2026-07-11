@@ -1,10 +1,12 @@
 'use client';
 
 import React, { useState } from 'react';
+import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
-import PikminSvg from '../pikmin/PikminSvg';
 import { synth } from '../../lib/audio';
 import { Volume2, VolumeX } from 'lucide-react';
+
+const PikminModel3D = dynamic(() => import('../pikmin/PikminModel3D'), { ssr: false });
 
 export interface IntroProps {
     onStart: (config: {
@@ -17,7 +19,6 @@ export interface IntroProps {
 export default function Intro({ onStart }: IntroProps) {
     const [step, setStep] = useState<'seed' | 'germinating' | 'customizing'>('seed');
     const [type, setType] = useState<'red' | 'yellow' | 'blue'>('red');
-    const [accessory, setAccessory] = useState<'leaf' | 'bud' | 'flower'>('leaf');
     const [soundOn, setSoundOn] = useState(true);
 
     // Trigger sound test and start animation
@@ -38,7 +39,8 @@ export default function Intro({ onStart }: IntroProps) {
         if (soundOn && synth) {
             synth.toggle(true);
         }
-        onStart({ type, accessory, soundOn });
+        // accessory is fixed to 'leaf': the STL model has its own stem sculpted
+        onStart({ type, accessory: 'leaf', soundOn });
     };
 
     const toggleSound = () => {
@@ -171,25 +173,21 @@ export default function Intro({ onStart }: IntroProps) {
                             Personaliza tu personaje explorador
                         </p>
 
-                        {/* Interactive Pikmin Preview */}
-                        <div className="relative w-40 h-40 flex items-center justify-center bg-stone-950/60 rounded-full border border-stone-850 shadow-inner mb-6">
-                            <PikminSvg
-                                type={type === 'red' ? 'red' : type === 'yellow' ? 'yellow' : 'blue'}
-                                accessory={accessory}
-                                isWalking={false}
-                                facingRight={true}
-                                width={120}
-                                height={140}
-                                className="drop-shadow-[0_4px_15px_rgba(255,255,255,0.05)]"
+                        {/* Interactive Pikmin 3D Preview */}
+                        <div className="relative w-40 h-40 flex items-center justify-center bg-stone-950/60 rounded-full border border-stone-850 shadow-inner mb-6 overflow-hidden">
+                            <PikminModel3D
+                                type={type}
+                                width={160}
+                                height={160}
                             />
                         </div>
 
-                        {/* Customizer Panel */}
+                        {/* Customizer Panel — solo especie (el modelo STL lleva su tallo integrado) */}
                         <div className="w-full bg-stone-900/60 border border-stone-850 rounded-2xl p-5 mb-8">
                             {/* Type Switcher */}
-                            <div className="mb-5 text-left">
+                            <div className="text-left">
                                 <span className="font-sans text-[10px] text-stone-500 uppercase tracking-widest font-semibold block mb-2.5">
-                                    1. Elige tu especie
+                                    Elige tu especie
                                 </span>
                                 <div className="grid grid-cols-3 gap-2">
                                     {(['red', 'yellow', 'blue'] as const).map((t) => (
@@ -202,27 +200,6 @@ export default function Intro({ onStart }: IntroProps) {
                                                 }`}
                                         >
                                             {t === 'red' ? 'Rojo 🔴' : t === 'yellow' ? 'Amarillo 🟡' : 'Azul 🔵'}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* Accessory Switcher */}
-                            <div className="text-left">
-                                <span className="font-sans text-[10px] text-stone-500 uppercase tracking-widest font-semibold block mb-2.5">
-                                    2. Elige tu brote
-                                </span>
-                                <div className="grid grid-cols-3 gap-2">
-                                    {(['leaf', 'bud', 'flower'] as const).map((a) => (
-                                        <button
-                                            key={a}
-                                            onClick={() => setAccessory(a)}
-                                            className={`py-2 px-3 text-xs font-sans rounded-lg border transition-all text-center capitalize ${accessory === a
-                                                ? 'bg-emerald-950/40 border-emerald-500/50 text-emerald-300 font-medium'
-                                                : 'bg-stone-950/60 border-stone-850 hover:border-stone-700 text-stone-400'
-                                                }`}
-                                        >
-                                            {a === 'leaf' ? 'Hoja 🍃' : a === 'bud' ? 'Capullo 🌸' : 'Flor 🌼'}
                                         </button>
                                     ))}
                                 </div>
